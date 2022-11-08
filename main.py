@@ -27,18 +27,21 @@ matri = np.zeros((8196,5126,320), dtype=np.float16) # Create a zero matrice for 
 
 to_pred = np.zeros((8196,5126), dtype=int) # Create a zero matrice for outputs
 
+
 for i in range(x.shape[0]):
     seq_len = x[i].shape[0]
     matri[i][0:seq_len] = x[i]
     to_pred[i][0:seq_len] = y[i]
 
-print(f"{matri[0][0:324]=}")
-print(f"{x[0]=}")
+
+matri=matri[:,0:512,:]
+print(f"la taille est de {matri.shape}")
+to_pred=to_pred[:,0:512]
+print(f"la taille est de {to_pred.shape}")
+
 
 X=np.asarray(matri)
 
-# print(to_pred.shape)
-# print(X.shape)
 
 tensor1 = tf.convert_to_tensor(X)
 # # print(tensor1)
