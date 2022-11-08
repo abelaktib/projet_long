@@ -31,15 +31,13 @@ def cnn():
     """
     # Neural network.
     inputs = Input(shape=(512,320))
-    conv = Conv1D(20, 320, activation="relu", kernel_initializer="he_uniform"
-                    , padding="same")(inputs)
+    conv = Conv1D(filters=100, kernel_size=1, input_shape = (512,320), padding="same", activation = "relu")(inputs)
     drop = Dropout(0.2)(conv)
-    conv2 = Conv1D(64, 320, activation="relu", kernel_initializer="he_uniform",
-                    padding="same")(drop)
+  
+    conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3, padding="same", activation = "relu")(drop)
     drop2 = Dropout(0.2)(conv2)
 
-    conv3 = Conv1D(64, 320, activation="relu", kernel_initializer="he_uniform",
-                    padding="same")(drop2)
+    conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3, padding="same", activation = "relu")(drop2)
     drop3 = Dropout(0.2)(conv3)
 
     # Set the output.
@@ -54,5 +52,5 @@ def cnn():
                   metrics=['accuracy'], weighted_metrics=["accuracy"])
     return model
 
-# model = cnn()
-# print(model.summary())
+model = cnn()
+print(model.summary())
