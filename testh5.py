@@ -27,5 +27,5 @@ model = cnn.cnn()
 
 
 
-history = model.fit(learn, epochs=30 ) #,validation_split=0.2 ,batch_size=50
+history = model.fit(learn, epochs=30 )
 
