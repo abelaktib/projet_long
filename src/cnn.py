@@ -30,7 +30,7 @@ def cnn():
         A compile model to be used for training.
     """
     # Neural network.
-    inputs = Input(shape=(512,320))
+    inputs = Input(shape=(2299,13,321))
     conv = Conv1D(filters=100, kernel_size=1, input_shape = (512,320), padding="same", activation = "relu")(inputs)
     drop = Dropout(0.2)(conv)
   
@@ -42,7 +42,7 @@ def cnn():
 
     # Set the output.
     drop3 = Flatten()(drop3)
-    output = Dense(512, activation="softmax")(drop3)
+    output = Dense(13, activation="softmax")(drop3)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
