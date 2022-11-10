@@ -31,7 +31,7 @@ def cnn():
     """
     # Neural network.
     inputs = Input(shape=(321,13))
-    conv = Conv1D(filters=100, kernel_size=1, input_shape = (512,320), padding="same", activation = "relu")(inputs)
+    conv = Conv1D(filters=100, kernel_size=1, padding="same", activation = "relu")(inputs)
     drop = Dropout(0.2)(conv)
   
     conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3, padding="same", activation = "relu")(drop)
