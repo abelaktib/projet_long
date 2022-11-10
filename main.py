@@ -70,7 +70,6 @@ h5f_y.close()
 X_learn = tfio.IODataset.from_hdf5(X, dataset="data/X.h5")
 Y_learn = tfio.IODataset.from_hdf5(to_pred, dataset="data/to_pred")
 
-
 learn = tf.data.Dataset.zip((X_learn, Y_learn)).batch(100).prefetch(tf.data.experimental.AUTOTUNE) #, sample_weights
 
 
@@ -78,4 +77,4 @@ model = cnn.cnn2()
 
 
 
-history = model.fit(learn, validation_split=0.2,epochs=2, batch_size=50)
+history = model.fit(learn, validation_split=0.2,epochs=2, batch_size=5)

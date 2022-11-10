@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 # [K]
 from keras import Model,Input
-from keras.layers import Dense, Conv1D, Dropout, Flatten
+from keras.layers import Dense, Conv1D, Dropout, Flatten,
 
 def cnn():
     """Apply a CNN to a given input.
@@ -52,8 +52,8 @@ def cnn():
                   metrics=['accuracy'], weighted_metrics=["accuracy"])
     return model
 
-# model = cnn()
-# print(model.summary())
+model = cnn()
+print(model.summary())
 
 
 
@@ -98,3 +98,5 @@ def cnn2():
 
 # model = cnn2()
 # print(model.summary())
+
+
