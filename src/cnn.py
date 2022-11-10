@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 # [K]
 from keras import Model,Input
-from keras.layers import Dense, Conv1D, Dropout, Flatten,
+from keras.layers import Dense, Conv1D, Dropout, Flatten
 
 def cnn():
     """Apply a CNN to a given input.

@@ -31,7 +31,7 @@ sample_weights = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="
 
 
 
-learn = tf.data.Dataset.zip((X, Y, sample_weights)).batch(5).prefetch(tf.data.experimental.AUTOTUNE)
+learn = tf.data.Dataset.zip((X, Y, sample_weights)).batch(100).prefetch(tf.data.experimental.AUTOTUNE)
 
 model = cnn.cnn()
 
