@@ -14,6 +14,7 @@ import pickle as pkl
 import pandas as pd
 import numpy as np
 import src.cnn as cnn
+import src.inception as inception
 from sklearn.utils import class_weight
 
 
@@ -73,7 +74,7 @@ Y_learn = tfio.IODataset.from_hdf5(to_pred, dataset="data/to_pred")
 learn = tf.data.Dataset.zip((X_learn, Y_learn)).batch(100).prefetch(tf.data.experimental.AUTOTUNE) #, sample_weights
 
 
-model = cnn.cnn2()
+model = cnn.inception()
 
 
 

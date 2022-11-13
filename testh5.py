@@ -14,6 +14,8 @@ import pickle as pkl
 import pandas as pd
 import numpy as np
 import src.cnn as cnn
+import src.inception as inception
+import src.rnn as rnn
 from sklearn.utils import class_weight
 
 
@@ -25,29 +27,30 @@ from sklearn.utils import class_weight
 # f.close()
 
 X =tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/x")
+print (X)
 Y = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/y")
-
+print (Y)
 sample_weights = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/sample_weight")
 
 
 
 learn = tf.data.Dataset.zip((X, Y, sample_weights)).batch(100).prefetch(tf.data.experimental.AUTOTUNE)
 
-model = cnn.cnn()
+model = rnn.rnn()
 
 
 
-history = model.fit(learn, epochs=200 )  ###,validation_split=0.02
+history = model.fit(learn, epochs=2 )  ###,validation_split=0.02
 
-print(history.history.keys())
-plt.plot(history.history['accuracy'])
-# plt.plot(history.history['val_accuracy'])
-# plt.legend(['Train', 'Test'], loc='upper left')
-plt.title('Model accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.show()
-plt.plot(history.history['loss'])
-# plt.plot(history.history['val_loss'])
-plt.show()
+# print(history.history.keys())
+# plt.plot(history.history['accuracy'])
+# # plt.plot(history.history['val_accuracy'])
+# # plt.legend(['Train', 'Test'], loc='upper left')
+# plt.title('Model accuracy')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.show()
+# plt.plot(history.history['loss'])
+# # plt.plot(history.history['val_loss'])
+# plt.show()
 
