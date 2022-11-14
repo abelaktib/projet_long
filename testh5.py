@@ -1,5 +1,5 @@
 __authors__ = ["BELAKTIB Anas"]
-__contact__ = [ "anas.belaktib@etu.u-paris.fr"]
+__contact__ = ["anas.belaktib@etu.u-paris.fr"]
 __date__ = "03/11/2022"
 __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
@@ -8,7 +8,7 @@ __copyright__ = "CC BY-SA"
 import h5py
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras import backend as K 
+from tensorflow.keras import backend as K
 import tensorflow_io as tfio
 import pickle as pkl
 import pandas as pd
@@ -26,21 +26,21 @@ from sklearn.utils import class_weight
 # sample_weights = f['sample_weight']
 # f.close()
 
-X =tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/x")
-print (X)
+X = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/x")
+print(X)
 Y = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/y")
-print (Y)
-sample_weights = tfio.IODataset.from_hdf5('data/database_window13.h5', dataset="/sample_weight")
+print(Y)
+sample_weights = tfio.IODataset.from_hdf5(
+    'data/database_window13.h5', dataset="/sample_weight")
 
 
-
-learn = tf.data.Dataset.zip((X, Y, sample_weights)).batch(100).prefetch(tf.data.experimental.AUTOTUNE)
+learn = tf.data.Dataset.zip((X, Y, sample_weights)).batch(
+    100).prefetch(tf.data.experimental.AUTOTUNE)
 
 model = rnn.rnn()
 
 
-
-history = model.fit(learn, epochs=2 )  ###,validation_split=0.02
+history = model.fit(learn, epochs=2)  # ,validation_split=0.02
 
 # print(history.history.keys())
 # plt.plot(history.history['accuracy'])
@@ -53,4 +53,3 @@ history = model.fit(learn, epochs=2 )  ###,validation_split=0.02
 # plt.plot(history.history['loss'])
 # # plt.plot(history.history['val_loss'])
 # plt.show()
-

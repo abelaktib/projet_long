@@ -28,22 +28,22 @@ def __inception(inputs):
         a block of inception.
     """
     # First convolution.
-    conv_1 = Conv1D(22, (1), padding="same", activation="relu")(inputs)
-    conv_1 = Conv1D(22, (3), padding="same", activation="relu")(conv_1)
+    conv_1 = Conv1D(filters=100, kernel_size=1, padding="same", activation = "relu")(inputs)
+    conv_1 = Conv1D(100, (3), padding="same", activation="relu")(conv_1)
     conv_1 = Dropout(0.2)(conv_1)
 
     # Second convolution.
-    conv_2 = Conv1D(22, (1), padding="same", activation="relu")(inputs)
-    conv_2 = Conv1D(22, (5), padding="same", activation="relu")(conv_2)
+    conv_2 = Conv1D(120, (1), padding="same", activation="relu")(inputs)
+    conv_2 = Conv1D(120, (5), padding="same", activation="relu")(conv_2)
     conv_2 = Dropout(0.2)(conv_2)
 
     # Third convolution.
     conv_3 = MaxPooling1D((3), strides=(1), padding="same")(inputs)
-    conv_3 = Conv1D(22, (1), padding="same", activation="relu")(conv_3)
+    conv_3 = Conv1D(144, (1), padding="same", activation="relu")(conv_3)
     conv_3 = Dropout(0.2)(conv_3)
 
     # Last convolution.
-    conv_4 = Conv1D(22, (1), padding="same", activation="relu")(inputs)
+    conv_4 = Conv1D(144, (1), padding="same", activation="relu")(inputs)
     conv_4 = Dropout(0.2)(conv_4)
 
     conv = concatenate([conv_1, conv_2, conv_3, conv_4], axis=2)

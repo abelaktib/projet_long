@@ -2,7 +2,7 @@
 """
 
 __authors__ = ["BELAKTIB Anas"]
-__contact__ = [ "anas.belaktib@etu.u-paris.fr"]
+__contact__ = ["anas.belaktib@etu.u-paris.fr"]
 __date__ = "03/11/2022"
 __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
@@ -11,8 +11,9 @@ __copyright__ = "CC BY-SA"
 import tensorflow as tf
 import numpy as np
 # [K]
-from keras import Model,Input
+from keras import Model, Input
 from keras.layers import Dense, Conv1D, Dropout, Flatten
+
 
 def cnn():
     """Apply a CNN to a given input.
@@ -30,14 +31,17 @@ def cnn():
         A compile model to be used for training.
     """
     # Neural network.
-    inputs = Input(shape=(321,13))
-    conv = Conv1D(filters=100, kernel_size=1, padding="same", activation = "relu")(inputs)
+    inputs = Input(shape=(321, 13))
+    conv = Conv1D(filters=100, kernel_size=1,
+                  padding="same", activation="relu")(inputs)
     drop = Dropout(0.2)(conv)
-  
-    conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3, padding="same", activation = "relu")(drop)
+
+    conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,
+                   padding="same", activation="relu")(drop)
     drop2 = Dropout(0.2)(conv2)
 
-    conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3, padding="same", activation = "relu")(drop2)
+    conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
+                   padding="same", activation="relu")(drop2)
     drop3 = Dropout(0.2)(conv3)
 
     # Set the output.
@@ -52,10 +56,9 @@ def cnn():
                   metrics=tf.keras.metrics.BinaryCrossentropy(from_logits=True), weighted_metrics=["accuracy"])
     return model
 
+
 model = cnn()
 print(model.summary())
-
-
 
 
 def cnn2():
@@ -74,14 +77,17 @@ def cnn2():
         A compile model to be used for training.
     """
     # Neural network.
-    inputs = Input(shape=(512,320))
-    conv = Conv1D(filters=100, kernel_size=1, input_shape = (512,320), padding="same", activation = "relu")(inputs)
+    inputs = Input(shape=(512, 320))
+    conv = Conv1D(filters=100, kernel_size=1, input_shape=(
+        512, 320), padding="same", activation="relu")(inputs)
     drop = Dropout(0.2)(conv)
-  
-    conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3, padding="same", activation = "relu")(drop)
+
+    conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,
+                   padding="same", activation="relu")(drop)
     drop2 = Dropout(0.2)(conv2)
 
-    conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3, padding="same", activation = "relu")(drop2)
+    conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
+                   padding="same", activation="relu")(drop2)
     drop3 = Dropout(0.2)(conv3)
 
     # Set the output.
@@ -98,5 +104,3 @@ def cnn2():
 
 # model = cnn2()
 # print(model.summary())
-
-
