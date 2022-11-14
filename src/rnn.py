@@ -28,10 +28,10 @@ def rnn():
     model = Model(inputs=inputs, outputs=output)
     
         # Compile then return the model.
-    model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(),
-                  metrics=['accuracy'], weighted_metrics=["accuracy"])
+    model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                  metrics=tf.keras.metrics.BinaryCrossentropy(from_logits=True), weighted_metrics=["accuracy"])
     return model
 
-if __name__ == "__main__":
-    model = rnn()
-    print(model.summary())
+# if __name__ == "__main__":
+#     model = rnn()
+#     print(model.summary())
