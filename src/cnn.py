@@ -42,14 +42,14 @@ def cnn():
 
     # Set the output.
     drop3 = Flatten()(drop3)
-    output = Dense(13, activation="softmax")(drop3)
+    output = Dense(13)(drop3)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
 
     # Compile then return the model.
-    model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(),
-                  metrics=['accuracy'], weighted_metrics=["accuracy"])
+    model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                  metrics=tf.keras.metrics.BinaryCrossentropy(from_logits=True), weighted_metrics=["accuracy"])
     return model
 
 model = cnn()
