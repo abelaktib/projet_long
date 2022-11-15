@@ -97,10 +97,10 @@ for i in range(10):
     learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).shuffle(1000).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
 
-    train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).shuffle(1000).batch(
+    train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
 
-    validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).shuffle(1000).batch(
+    validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
 
      ##CREATE CALLBACKS
