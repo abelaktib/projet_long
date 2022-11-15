@@ -10,6 +10,7 @@ __copyright__ = "CC BY-SA"
 # [T]
 import tensorflow as tf
 import numpy as np
+
 # [K]
 from keras import Model, Input
 from keras.layers import Dense, Conv1D, Dropout, Flatten
@@ -50,6 +51,8 @@ def cnn():
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
+    
+
 
     # Compile then return the model.
     model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -57,8 +60,8 @@ def cnn():
     return model
 
 
-model = cnn()
-print(model.summary())
+# model = cnn()
+# print(model.summary())
 
 
 def cnn2():
