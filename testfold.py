@@ -20,12 +20,15 @@ from sklearn.utils import class_weight
 from sklearn.model_selection import LeaveOneGroupOut
 from sklearn.model_selection import GroupKFold
 
-#### Save model name each k fold
+# Save model name each k fold
+
+
 def get_model_name(k):
     return 'model_'+str(k)+'.h5'
 ################################
 
- ######### Choisir 1 seul Modèle.
+
+ # Choisir 1 seul Modèle.
 model = cnn.cnn()
 
 # # model = inception.inception()
@@ -48,66 +51,79 @@ print(Y_test)
 #################
 
 
-
 VALIDATION_ACCURACY = []
 VALIDATION_LOSS = []
 
-save_dir = '/saved_models/'
+save_dir = 'saved_models/'
 fold_var = 0
 
-
+# help(tfio.IODataset.from_hdf5(
+    #  'data/small_database_window13_withfolds.h5', dataset=f"/x_train_0"))
 
 for i in range(10):
     list_noi = [*range(10)]
     list_noi.remove(i)
-    
-    X_train = tfio.IODataset.from_hdf5(
-        'data/small_database_window13_withfolds.h5', dataset=f"/x_train") 
+    for j in list_noi:
+        X_train = tfio.IODataset.from_hdf5(
+        'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[0]}").concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[1]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[2]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[3]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[4]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[5]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[6]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[7]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[8]}"))
 
     Y_train = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/y_train")
+        'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[0]}").concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[1]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[2]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[3]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[4]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[5]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[6]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[7]}")).concatenate(
+            tfio.IODataset.from_hdf5('data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[8]}"))
 
     sample_weights = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/sample_weight")
-    
+        'data/small_database_window13_withfolds.h5', dataset="/sample_weight")
+
     X_val = tfio.IODataset.from_hdf5(
         'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{i}")
     Y_val = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{i}")
-    
-    learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).batch(
+        'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{i}")
+
+    learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).shuffle(1000).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
 
-    train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).batch(
+    train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).shuffle(1000).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
-    
-    validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).batch(
+
+    validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).shuffle(1000).batch(
         100).prefetch(tf.data.experimental.AUTOTUNE)
-    
-    
-    
+
      ##CREATE CALLBACKS
-    checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var), 
-							monitor='val_accuracy', verbose=1, 
-							save_best_only=True, mode='max')
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var),
+    						monitor='val_accuracy', verbose=1,
+    						save_best_only=True, mode='max')
     callbacks_list = [checkpoint]
-    
-    
-    history = model.fit(learn, epochs=5, validation_data=validation, callbacks=callbacks_list)
-    
+
+    history = model.fit(learn, epochs=5, validation_data=validation, callbacks=callbacks_list, shuffle=True)
+
     	#PLOT HISTORY
-	#		:
-	#		:
-	
-	# LOAD BEST MODEL to evaluate the performance of the model
- 
-    model.load_weights("/saved_models/model_"+str(fold_var)+".h5")
-    results = model.evaluate(train) 
+    #		:
+    #		:
+
+    # LOAD BEST MODEL to evaluate the performance of the model
+
+    model.load_weights("saved_models/model_"+str(fold_var)+".h5")
+    results = model.evaluate(train)
     results = dict(zip(model.metrics_names,results))
-	
+
     VALIDATION_ACCURACY.append(results['accuracy'])
     VALIDATION_LOSS.append(results['loss'])
-	
+
     tf.keras.backend.clear_session()
-	
+
     fold_var += 1
