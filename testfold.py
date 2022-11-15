@@ -14,69 +14,16 @@ import pickle as pkl
 import pandas as pd
 import numpy as np
 import src.cnn as cnn
-import src.inception as inception
-import src.gru as gru
+# import src.inception as inception
+# import src.gru as gru
 from sklearn.utils import class_weight
 from sklearn.model_selection import LeaveOneGroupOut
 from sklearn.model_selection import GroupKFold
 
-# kfold = KFold(n_splits=num_folds, shuffle=True)
-# for train, test in kfold.split(inputs, targets):
 
-X_train = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/x_train")
-print(X_train)
-Y_train = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/y_train")
-print(Y_train)
-sample_weights = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/sample_weight")
-print(sample_weights)
-####### Make group for K folds
-hf = h5py.File('data/small_database_window13_withfolds.h5', 'r')
-groups = np.array(hf['/folds'][:]) 
-
-print(groups)
-
-# logo = LeaveOneGroupOut()
-
-group_kfold = GroupKFold(n_splits=10)
-
-group_kfold.get_n_splits(X_train,Y_train, groups)
-
-group_kfold.get_n_splits(groups=groups)
-
-for train_index, val_index in group_kfold.split(X_train,Y_train, groups):
-    print("TRAIN:", train_index, "TEST:", val_index)
-
-
-
-
-
-
-
-
-
-
-
-
-
-# X_test = tfio.IODataset.from_hdf5(
-#     'data/small_database_window13_withfolds.h5', dataset="/x_test")
-# print(X_test)
-# Y_test = tfio.IODataset.from_hdf5(
-#     'data/small_database_window13_withfolds.h5', dataset="/y_test")
-# print(Y_test)
-
-
-# learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).batch(
-#     100).prefetch(tf.data.experimental.AUTOTUNE)
-
-# train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).batch(
-#     100).prefetch(tf.data.experimental.AUTOTUNE)
 
 # # ######### Choisir 1 seul Modèle.
-# model = cnn.cnn()
+model = cnn.cnn()
 
 # # model = inception.inception()
 
@@ -84,15 +31,57 @@ for train_index, val_index in group_kfold.split(X_train,Y_train, groups):
 
 # #################
 
-# history = model.fit(learn, epochs=20)
+###### Chargement du jeu Test ################
+X_test = tfio.IODataset.from_hdf5(
+    'data/small_database_window13_withfolds.h5', dataset="/x_test")
 
-# print(history.history.keys())
-# plt.plot(history.history['accuracy'])
-# plt.legend(['Train'], loc='upper left')
-# plt.ylabel('Accuracy')
-# plt.xlabel('Epoch')
-# plt.show()
-# plt.plot(history.history['loss'])
-# plt.show()
+print(X_test)
+Y_test = tfio.IODataset.from_hdf5(
+    'data/small_database_window13_withfolds.h5', dataset="/y_test")
+
+print(Y_test)
+
+#################
+
+
+
+for i in range(10):
+    X_train = tfio.IODataset.from_hdf5(
+        'data/small_database_window13_withfolds.h5', dataset="/x_train")
+
+    Y_train = tfio.IODataset.from_hdf5(
+    'data/small_database_window13_withfolds.h5', dataset="/y_train")
+
+    sample_weights = tfio.IODataset.from_hdf5(
+    'data/small_database_window13_withfolds.h5', dataset="/sample_weight")
+    
+    X_val = tfio.IODataset.from_hdf5(
+        'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{i}")
+    Y_val = tfio.IODataset.from_hdf5(
+    'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{i}")
+    
+    learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).batch(
+        100).prefetch(tf.data.experimental.AUTOTUNE)
+
+    train = tf.data.Dataset.zip((X_test, Y_test, sample_weights)).batch(
+        100).prefetch(tf.data.experimental.AUTOTUNE)
+    
+    validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).batch(
+        100).prefetch(tf.data.experimental.AUTOTUNE)
+
+
+    history = model.fit(learn, epochs=20, validation_data=validation)
+
+print(history.history.keys())
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.show()
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.show()
 
 # model.evaluate(train)
