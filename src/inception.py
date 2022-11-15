@@ -5,7 +5,7 @@
 import tensorflow as tf
 # [K]
 from keras import Input, Model
-from keras.layers import Conv1D, Dense, concatenate, MaxPooling1D, Multiply,Flatten
+from keras.layers import Conv1D, Dense, concatenate, MaxPooling1D,Flatten
 from keras.layers import Dropout
 
 
@@ -103,6 +103,6 @@ def inception(n_inception=2):
     return model
 
 
-# if __name__ == "__main__":
-#     model = inception()
-#     print(model.summary())
+if __name__ == "__main__":
+    model = inception()
+    print(model.summary())
