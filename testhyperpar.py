@@ -38,7 +38,8 @@ model_cnn = cnn.cnn()
 list_noi = list(range(10))
 list_noi.remove(1)
 
-FILE = 'data/small_database_window13_withfolds.h5'
+# FILE = 'data/small_database_window13_withfolds.h5'
+FILE = '/home/madeleine/gheeraert/SHARED/sugarpred_window13_10folds.h5'
 X_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[0]}")
 
 Y_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[0]}")
