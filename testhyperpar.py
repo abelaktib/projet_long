@@ -10,7 +10,6 @@ import h5py
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_io as tfio
-import pickle as pkl
 import pandas as pd
 import numpy as np
 import src.cnn as cnn
@@ -39,28 +38,22 @@ model_cnn = cnn.cnn()
 list_noi = list(range(10))
 list_noi.remove(1)
 
-X_train = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[0]}")
+FILE = 'data/small_database_window13_withfolds.h5'
+X_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[0]}")
 
-Y_train = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[0]}")
+Y_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[0]}")
 
 for j in range(1, 9, 1):
-    X_train.concatenate(tfio.IODataset.from_hdf5(
-        'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{list_noi[j]}"))
-    Y_train.concatenate(tfio.IODataset.from_hdf5(
-        'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{list_noi[j]}"))
+    X_train.concatenate(tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[j]}"))
+    Y_train.concatenate(tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[j]}"))
 
 # #
-X_val = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset=f"/x_train_{1}")
-Y_val = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset=f"/y_train_{1}")
+X_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{1}")
+Y_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{1}")
 #
 
 ###### Ajout des poids #####
-sample_weights = tfio.IODataset.from_hdf5(
-    'data/small_database_window13_withfolds.h5', dataset="/sample_weight")
+sample_weights = tfio.IODataset.from_hdf5(FILE, dataset="/sample_weight")
 
 # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sample_weights)).shuffle(
