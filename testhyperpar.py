@@ -1,4 +1,4 @@
-__authors__ = ["BELAKTIB Anas"]
+_authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
 __date__ = "16/11/2022"
 __version__ = "1.0.0"
@@ -38,7 +38,7 @@ model_cnn = cnn.cnn()
 list_noi = list(range(10))
 list_noi.remove(1)
 
-FILE = 'data/small_database_window13_withfolds.h5'
+FILE = '/home/madeleine/gheeraert/SHARED/sugarpred_window13_10folds.h5'
 X_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[0]}")
 
 Y_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[0]}")
@@ -62,13 +62,6 @@ validation = tf.data.Dataset.zip((X_val, Y_val, sample_weights)).shuffle(
     50).batch(1).prefetch(tf.data.experimental.AUTOTUNE)
 
 
-# CREATION DE CALLBACKS
-
-# Ce callback permet de stopper les epoch lorsque les performance n'avance plus.
-earlyStopping = EarlyStopping(
-    monitor='val_loss', patience=10, verbose=0, mode='min')
-#
-callbacks_list = [earlyStopping]
 #
 # list des batchsize a tester
 
