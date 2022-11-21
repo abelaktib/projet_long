@@ -65,8 +65,8 @@ print(Y_train)
 print(X_val)
 print(Y_val)
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
