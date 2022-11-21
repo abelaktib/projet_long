@@ -5,6 +5,8 @@ __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
 
 # IMPORTS
+from numba import jit
+
 import random
 import h5py
 import os
@@ -60,18 +62,20 @@ sw_validation = tfio.IODataset.from_hdf5(FILE, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
-validation = tf.data.Dataset.zip((X_val,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
+validation= tf.data.Dataset.zip((X_val,Y_val,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
+val = tf.data.Dataset.zip((X_val)).batch(64).prefetch(tf.data.experimental.AUTOTUNE) #For callbacks y_pred
 
 
 # # #
 
+
 class PredictionCallback(tf.keras.callbacks.Callback):    
   def on_epoch_end(self, epoch, logs={}):
-    y_pred = self.model.predict(validation)
+    y_pred = self.model.predict(val)
     print('prediction: {} at epoch: {}'.format(y_pred, epoch))
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=5, min_lr=0.001)
+                              patience=2, min_lr=0)
 
     
     
@@ -87,11 +91,13 @@ with open("history2.csv", "w", encoding="utf-8") as file:
     file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS\n")
     
     for batch in batch_size:
+        
         history = model_cnn.fit(
             learn, validation_data=validation,
             epochs=EPOCHS,
             batch_size=64,
-              callbacks=callbacks_list,class_weight=class_weights
+              callbacks=callbacks_list,class_weight=class_weights,
+          shuffle=True
         )
 
         for e in range(EPOCHS):

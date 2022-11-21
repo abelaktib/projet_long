@@ -22,7 +22,7 @@ def gru():
     flat_1 = Flatten() (bi)
 
     
-    output = Dense(13, activation="linear")(flat_1)
+    output = Dense(2, activation="linear")(flat_1)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
@@ -32,6 +32,6 @@ def gru():
                   metrics=tf.keras.metrics.BinaryCrossentropy(from_logits=True), weighted_metrics=["accuracy"])
     return model
 
-# if __name__ == "__main__":
-#     model = gru()
-#     print(model.summary())
+if __name__ == "__main__":
+    model = gru()
+    print(model.summary())
