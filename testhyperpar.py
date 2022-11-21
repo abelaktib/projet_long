@@ -5,7 +5,6 @@ __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
 
 # # IMPORTS
-from numba import jit
 import sys
 import random
 import h5py
