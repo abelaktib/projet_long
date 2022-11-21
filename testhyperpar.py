@@ -25,6 +25,8 @@ from keras.wrappers.scikit_learn import KerasClassifier
 from keras.callbacks import EarlyStopping,TensorBoard,ReduceLROnPlateau
 from sklearn.metrics import get_scorer_names
 
+tf.config.list_physical_devices('GPU') 
+
 parse=argparse.ArgumentParser()
 parse.add_argument("file")
 args=parse.parse_args()
@@ -91,7 +93,6 @@ callbacks_list = [PredictionCallback(),ReduceLROnPlateau()]
 class_weights ={0:0.96,1:0.04}
 
 # # list des batchsize a tester
-
 batch_size=[64]
 EPOCHS = 20
 with open("history2.csv", "w", encoding="utf-8") as file:
