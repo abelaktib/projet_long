@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 
 # [K]
-from keras import Model, Input
+from keras import Model, Input, optimizers
 from keras.layers import Dense, Conv1D, Dropout, Flatten
 
 
@@ -33,37 +33,40 @@ def cnn():
     """
     # Neural network.
     inputs = Input(shape=(321, 13))
-    conv = Conv1D(filters=100, kernel_size=1,
-                  padding="same", activation="relu")(inputs)
+    conv = Conv1D(filters=100, kernel_size=1, padding="same")(inputs)
     drop = Dropout(0.2)(conv)
 
     conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,
-                   padding="same", activation="relu")(drop)
+                   padding="same")(drop)
     drop2 = Dropout(0.2)(conv2)
 
     conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
-                   padding="same", activation="relu")(drop2)
+                   padding="same")(drop2)
     drop3 = Dropout(0.2)(conv3)
 
+    
     # Set the output.
-    drop3 = Flatten()(drop3)
-    dense = Dense(512,activation="softmax")(drop3)
-    dense = Dense(13,activation="softmax")(dense)
-    output = Dense(13,activation="softmax")(dense)
+    flat = Flatten()(drop3)
+    dense = Dense(100,activation="softmax")(flat)
+    drop4 = Dropout(0.2)(dense)
+    dense2 = Dense(13,activation="softmax")(drop4)
+    drop5 = Dropout(0.2)(dense2)
+    dense3 = Dense(2, activation="softmax")(drop5)
+    output = Flatten()(dense3)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
     
 
-
+    # opt = optimizers.Adam(learning_rate=1e-6)
     # Compile then return the model.
     model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                  metrics=tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0), weighted_metrics=["accuracy"])
+                  metrics=tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5), weighted_metrics=["accuracy"])
     return model
 
 
-# model = cnn()
-# print(model.summary())
+model = cnn()
+print(model.summary())
 
 
 def cnn2():
@@ -94,6 +97,7 @@ def cnn2():
     conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
                    padding="same", activation="relu")(drop2)
     drop3 = Dropout(0.2)(conv3)
+    
 
     # Set the output.
     drop3 = Flatten()(drop3)

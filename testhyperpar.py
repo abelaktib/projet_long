@@ -19,7 +19,7 @@ import src.cnn as cnn
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.utils import class_weight
 from keras.wrappers.scikit_learn import KerasClassifier
-from keras.callbacks import EarlyStopping,TensorBoard
+from keras.callbacks import EarlyStopping,TensorBoard,ReduceLROnPlateau
 from sklearn.metrics import get_scorer_names
 
 
@@ -36,58 +36,61 @@ model_cnn = cnn.cnn()
 #
 ###### Chargement ddes dataset ################
 
-list_noi = list(range(10))
-list_noi.remove(1)
-
-FILE = 'data/small_database_window13_withfolds.h5'
-X_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[0]}")
-Y_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[0]}")
+FILE = 'data/smalldatabase_window13_c.h5'
+import h5py
+f = h5py.File(FILE, 'r')
+print(list(f.keys()))
 
 
-for j in range(1, 9, 1):
-    X_train.concatenate(tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{list_noi[j]}"))
-    Y_train.concatenate(tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{list_noi[j]}"))
+X_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/X_training")
+Y_train = tfio.IODataset.from_hdf5(FILE, dataset=f"/Y_training")
 
 # #
-X_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/x_train_{1}")
-Y_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/y_train_{1}")
+X_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/X_validation")
+Y_val = tfio.IODataset.from_hdf5(FILE, dataset=f"/Y_validation")
 # #
+print(X_train)
+print(Y_train)
+
+print(X_val)
+print(Y_val)
+# ###### Ajout des poids #####
+sw_training = tfio.IODataset.from_hdf5(FILE, dataset="/sw_training")
+sw_validation = tfio.IODataset.from_hdf5(FILE, dataset="/sw_validation")
+
+# # Creation des dataset contenant les X , Y et poids  de chaque groupe
+learn = tf.data.Dataset.zip((X_train, Y_train,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
+validation = tf.data.Dataset.zip((X_val,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
 
 
-###### Ajout des poids #####
-sample_weights = tfio.IODataset.from_hdf5(FILE, dataset="/sample_weight")
-
-# Creation des dataset contenant les X , Y et poids  de chaque groupe
-learn = tf.data.Dataset.zip((X_train, Y_train)).batch(100).prefetch(tf.data.experimental.AUTOTUNE)
-validation = tf.data.Dataset.zip((X_val)).batch(100).prefetch(tf.data.experimental.AUTOTUNE)
-
-
-# #
+# # #
 
 class PredictionCallback(tf.keras.callbacks.Callback):    
   def on_epoch_end(self, epoch, logs={}):
     y_pred = self.model.predict(validation)
     print('prediction: {} at epoch: {}'.format(y_pred, epoch))
+
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                              patience=5, min_lr=0.001)
+
     
     
-    
-callbacks_list = [PredictionCallback()]
+callbacks_list = [PredictionCallback(),ReduceLROnPlateau()]
 
-class_weights ={0:0.8,1:0.2}
+class_weights ={0:0.96,1:0.04}
 
-# list des batchsize a tester
+# # list des batchsize a tester
 
-batch_size = [50, 100, 200, 250, 300]
-EPOCHS = 5
-batch_size = [300]
-with open("history.csv", "w", encoding="utf-8") as file:
+batch_size=[64]
+EPOCHS = 20
+with open("history2.csv", "w", encoding="utf-8") as file:
     file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS\n")
     
     for batch in batch_size:
         history = model_cnn.fit(
             learn, validation_data=validation,
             epochs=EPOCHS,
-            batch_size=batch,
+            batch_size=64,
               callbacks=callbacks_list,class_weight=class_weights
         )
 
