@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 
 # [K]
-from keras import Model, Input, optimizers
+from keras import Model, Input,
 from keras.layers import Dense, Conv1D, Dropout, Flatten
 
 
@@ -57,7 +57,7 @@ def cnn():
     model = Model(inputs=inputs, outputs=output)
     
 
-    opt = optimizers.Adam(learning_rate=1e-4)
+    opt = tf.keras.optimizers.Adam(learning_rate=1e-4)
     # Compile then return the model.
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                   metrics=tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5), weighted_metrics=["accuracy"])
