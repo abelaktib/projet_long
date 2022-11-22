@@ -19,10 +19,8 @@ import argparse
 # import src.inception as inception
 # import src.gru as gru
 from sklearn.model_selection import GridSearchCV, cross_val_score
-from sklearn.utils import class_weight
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.callbacks import EarlyStopping,TensorBoard,ReduceLROnPlateau
-from sklearn.metrics import get_scorer_names
 
 tf.config.list_physical_devices('GPU') 
 
