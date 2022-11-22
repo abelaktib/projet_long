@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 
 # [K]
-from keras import Model, Input,
+from keras import Model, Input
 from keras.layers import Dense, Conv1D, Dropout, Flatten
 
 
