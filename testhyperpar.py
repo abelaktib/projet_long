@@ -38,7 +38,7 @@ save_dir = 'saved_models/'
 fold_var = 0
 
 def get_model_name(k):
-    return 'model_'+str(k)+'.h5'
+    return 'model_bigdata'+str(k)+'.h5'
 
 ##Random seed
 random.seed(10)
@@ -97,15 +97,15 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
 
     
     
-callbacks_list = [PredictionCallback(),ReduceLROnPlateau()]
+callbacks_list = [PredictionCallback(),reduce_lr,checkpoint]
 
 class_weights ={0:0.96,1:0.04}
 
 # # list des batchsize a tester
 batch_size=[64]
 EPOCHS = 20
-with open("history2.csv", "w", encoding="utf-8") as file:
-    file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS\n")
+with open("historybigdata.csv", "w", encoding="utf-8") as file:
+    file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,LR\n")
     
     for batch in batch_size:
         
@@ -121,5 +121,22 @@ with open("history2.csv", "w", encoding="utf-8") as file:
             file.write(f"{batch},{history.history['accuracy'][e]},"
                    f"{history.history['val_accuracy'][e]},"
                    f"{history.history['loss'][e]},"
-                   f"{history.history['val_loss'][e]}\n")
+                   f"{history.history['val_loss'][e]},"
+                   f"{history.history['auc'][e]},"
+                   f"{history.history['auc_1'][e]},"
+                   f"{history.history['val_auc'][e]},"
+                   f"{history.history['val_auc_1'][e]},"
+                   f"{history.history['precision'][e]},"
+                   f"{history.history['recall'][e]},"
+                   f"{history.history['val_precision'][e]},"  
+                   f"{history.history['val_recall'][e]},"
+                   f"{history.history['lr'][e]}\n")
 fold_var += 1
+print(history.history.keys())
+# plt.plot(history.history['accuracy'])
+# plt.legend(['Train'], loc='upper left')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.show()
+# plt.plot(history.history['loss'])
+# plt.show()
