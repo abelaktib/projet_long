@@ -71,8 +71,8 @@ print(Y_train)
 print(X_val)
 print(Y_val)
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train,sw_training)).batch(64).prefetch(tf.data.experimental.AUTOTUNE)
@@ -103,9 +103,9 @@ class_weights ={0:0.96,1:0.04}
 
 # # list des batchsize a tester
 batch_size=[64]
-EPOCHS = 20
+EPOCHS = 1
 with open("historybigdata.csv", "w", encoding="utf-8") as file:
-    file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,LR\n")
+    file.write("BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
     
     for batch in batch_size:
         
@@ -130,6 +130,8 @@ with open("historybigdata.csv", "w", encoding="utf-8") as file:
                    f"{history.history['recall'][e]},"
                    f"{history.history['val_precision'][e]},"  
                    f"{history.history['val_recall'][e]},"
+                   f"{history.history['binary_accuracy'][e]},"
+                   f"{history.history['val_binary_accuracy'][e]},"
                    f"{history.history['lr'][e]}\n")
 fold_var += 1
 print(history.history.keys())
