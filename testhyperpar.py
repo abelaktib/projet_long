@@ -92,17 +92,17 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
-class PredictionCallback(tf.keras.callbacks.Callback):
-    def on_epoch_end(self, epoch, logs={}):
-        y_pred = self.model.predict(val)
-        print('prediction: {} at epoch: {}'.format(y_pred, epoch))
+# class PredictionCallback(tf.keras.callbacks.Callback):
+#     def on_epoch_end(self, epoch, logs={}):
+#         y_pred = self.model.predict(val)
+#         print('prediction: {} at epoch: {}'.format(y_pred, epoch))
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [PredictionCallback(), reduce_lr, checkpoint]
+callbacks_list = [reduce_lr, checkpoint]  #PredictionCallback(),
 
 class_weights = {0: 0.96, 1: 0.04}
 
