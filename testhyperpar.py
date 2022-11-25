@@ -9,10 +9,9 @@ import pandas as pd
 import tensorflow_io as tfio
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import os
 import h5py
 import random
-import sys
+
 _authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
 __date__ = "16/11/2022"
@@ -44,7 +43,7 @@ def get_model_name(k):
 
 
 # Random seed
-random.seed(10)
+tf.keras.utils.set_random_seed(42)
 
 # SELECTION DU MODEL: Choisir 1 seul Modèle.
 model_cnn = cnn.cnn()
@@ -109,7 +108,7 @@ class_weights = {0: 0.96, 1: 0.04}
 # # list des batchsize a tester
 batch_size = [64]
 EPOCHS = 20
-with open("historybigdata.csv", "w", encoding="utf-8") as file:
+with open("historybigdata_seed.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR,TRUE_POSITIVES,TRUE_NEGATIVES,FALSE_POSITIVES,FALSE_NEGATIVES,VAL_TRUE_POSITIVES,VAL_TRUE_NEGATIVES,VAL_FALSE_POSITIVES,VAL_FALSE_NEGATIVES\n")
 
     for batch in batch_size:
