@@ -43,7 +43,7 @@ def get_model_name(k):
 
 
 # Random seed
-tf.keras.utils.set_random_seed(42)
+tf.random.set_seed(42)
 
 # SELECTION DU MODEL: Choisir 1 seul Modèle.
 model_cnn = cnn.cnn()
