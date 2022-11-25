@@ -19,7 +19,7 @@ __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
 
 # # IMPORTS
-# import src.inception as inception
+import src.inception as inception
 # import src.gru as gru
 
 tf.config.list_physical_devices('GPU')
@@ -43,7 +43,10 @@ def get_model_name(k):
 
 
 # Random seed
-tf.random.set_seed(38)
+SEED=4
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
 
 # SELECTION DU MODEL: Choisir 1 seul Modèle.
 model_cnn = cnn.cnn()
@@ -72,16 +75,18 @@ print(Y_train)
 print(X_val)
 print(Y_val)
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")#ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
     64).prefetch(tf.data.experimental.AUTOTUNE)
-validation = tf.data.Dataset.zip((X_val, Y_val, sw_training)).batch(
+validation = tf.data.Dataset.zip((X_val, Y_val, sw_validation)).batch(
     64).prefetch(tf.data.experimental.AUTOTUNE)
-val = tf.data.Dataset.zip((X_val)).batch(64).prefetch(
+x_val = tf.data.Dataset.zip((X_val)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)  # For callbacks y_pred
+x_learn= tf.data.Dataset.zip((X_train)).batch(64).prefetch(
+    tf.data.experimental.AUTOTUNE) 
 
 
 ###### CALLBACKS#######
@@ -91,19 +96,20 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
-# class PredictionCallback(tf.keras.callbacks.Callback):
-#     def on_epoch_end(self, epoch, logs={}):
-#         y_pred = self.model.predict(val)
-#         print('prediction: {} at epoch: {}'.format(y_pred, epoch))
+class PredictionCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs={}):
+        y_pred = self.model.predict(x_learn)
+        uninq_ypred= tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
+        print('prediction: {} at epoch: {} {}'.format(y_pred, epoch,uninq_ypred))
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [reduce_lr, checkpoint]  #PredictionCallback(),
+callbacks_list = [PredictionCallback(),reduce_lr, checkpoint]  
 
-class_weights = {0: 0.96, 1: 0.04}
+class_weights = {0:0.0561, 1:17.8179}
 
 # # list des batchsize a tester
 batch_size = [64]
@@ -119,7 +125,7 @@ with open("historybigdata_seed.csv", "w", encoding="utf-8") as file:
             batch_size=64,
             callbacks=callbacks_list, class_weight=class_weights,
             shuffle=True
-        )
+        ) #
 
         for e in range(EPOCHS):
             file.write(f"{e},{batch},{history.history['accuracy'][e]},"

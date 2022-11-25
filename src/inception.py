@@ -89,17 +89,25 @@ def inception(n_inception=2):
     dense_4 = Dense(20, activation="relu")(flat_1)
     drop_4 = Dropout(0.2)(dense_4)
 
-    output = Dense(13, activation="linear")(drop_4)
+    output = Dense(2, activation="linear")(drop_4)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
 
 
+    opt = tf.keras.optimizers.Adam(learning_rate=1e-4)
     # Compile then return the model.
-    model.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                  metrics=tf.keras.metrics.BinaryCrossentropy(from_logits=True), weighted_metrics=["accuracy"])
-
-
+    model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                  weighted_metrics=[tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5),
+                           tf.keras.metrics.Precision(),
+                           tf.keras.metrics.Recall(),
+                           tf.keras.metrics.AUC(),
+                           tf.keras.metrics.AUC(curve="PR")]
+                  
+                  ,metrics=[tf.keras.metrics.TruePositives(),
+                           tf.keras.metrics.TrueNegatives(),
+                           tf.keras.metrics.FalsePositives(),
+                           tf.keras.metrics.FalseNegatives() ,tf.keras.metrics.Accuracy()])
     return model
 
 
