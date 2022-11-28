@@ -11,6 +11,8 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import h5py
 import random
+from sklearn import metrics
+import tensorflow_datasets as tfds
 
 _authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
@@ -87,8 +89,11 @@ x_val = tf.data.Dataset.zip((X_val)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)  # For callbacks y_pred
 x_learn= tf.data.Dataset.zip((X_train)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE) 
-
-
+y_learn= tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
+    tf.data .experimental.AUTOTUNE )
+y_learn= tfds.as_numpy(y_learn)
+print(y_learn)
+##sw_training
 ###### CALLBACKS#######
 # CREATION DE CALLBACKS
 checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var),
@@ -99,8 +104,12 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
 class PredictionCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
+        print(y_pred)
         uninq_ypred= tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
+        ############ MATRIX DE CONFUSION  #############
+        matrix = metrics.confusion_matrix(tf.math.argmax(y_learn, axis=1),tf.math.argmax(y_pred, axis=1))
         print('prediction: {} at epoch: {} {}'.format(y_pred, epoch,uninq_ypred))
+        print(matrix)
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
@@ -113,8 +122,8 @@ class_weights = {0:0.0561, 1:17.8179}
 
 # # list des batchsize a tester
 batch_size = [64]
-EPOCHS = 20
-with open("historybigdata_seed.csv", "w", encoding="utf-8") as file:
+EPOCHS = 1
+with open("historybigdata_sw.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR,TRUE_POSITIVES,TRUE_NEGATIVES,FALSE_POSITIVES,FALSE_NEGATIVES,VAL_TRUE_POSITIVES,VAL_TRUE_NEGATIVES,VAL_FALSE_POSITIVES,VAL_FALSE_NEGATIVES\n")
 
     for batch in batch_size:

@@ -47,9 +47,9 @@ def cnn():
     
     # Set the output.
     flat = Flatten()(drop3)
-    dense = Dense(100,activation="softmax")(flat)
+    dense = Dense(100)(flat)
     drop4 = Dropout(0.5)(dense)
-    dense2 = Dense(13,activation="softmax")(drop4)
+    dense2 = Dense(13)(drop4)
     dense3 = Dense(2, activation="softmax")(dense2)
     output = Flatten()(dense3)
 
