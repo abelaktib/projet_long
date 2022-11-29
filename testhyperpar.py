@@ -1,3 +1,4 @@
+import src.inception as inception
 from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV, cross_val_score
@@ -21,7 +22,6 @@ __version__ = "1.0.0"
 __copyright__ = "CC BY-SA"
 
 # # IMPORTS
-import src.inception as inception
 # import src.gru as gru
 
 tf.config.list_physical_devices('GPU')
@@ -45,7 +45,7 @@ def get_model_name(k):
 
 
 # Random seed
-SEED=4
+SEED = 4
 random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
@@ -71,29 +71,37 @@ Y_train = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_training")
 X_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/X_validation")
 Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
-print(X_train)
-print(Y_train)
 
-print(X_val)
-print(Y_val)
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")#ample_weights
+sw_training = tfio.IODataset.from_hdf5(
+    args.file, dataset="/sw_training")  # ample_weights
 sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
     64).prefetch(tf.data.experimental.AUTOTUNE)
+
+dir(learn)
+
+print(learn.element_spec[1])
+
+
 validation = tf.data.Dataset.zip((X_val, Y_val, sw_validation)).batch(
     64).prefetch(tf.data.experimental.AUTOTUNE)
+
+
 x_val = tf.data.Dataset.zip((X_val)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)  # For callbacks y_pred
-x_learn= tf.data.Dataset.zip((X_train)).batch(64).prefetch(
-    tf.data.experimental.AUTOTUNE) 
-y_learn= tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
-    tf.data .experimental.AUTOTUNE )
-y_learn= tfds.as_numpy(y_learn)
-print(y_learn)
-##sw_training
+x_learn = tf.data.Dataset.zip((X_train)).batch(64).prefetch(
+    tf.data.experimental.AUTOTUNE)
+y_learn = tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
+    tf.data .experimental.AUTOTUNE)
+y_learn =[i for i in y_learn.as_numpy_iterator()]
+y_learn = tf.ragged.constant(y_learn)
+dir(y_learn)
+# sw_training
+
+
 ###### CALLBACKS#######
 # CREATION DE CALLBACKS
 checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var),
@@ -102,23 +110,31 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
 
 
 class PredictionCallback(tf.keras.callbacks.Callback):
+    def __init__(self, y_learn):
+        super()
+        self.y_learn = y_learn
+
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
         print(y_pred)
-        uninq_ypred= tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
+        uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
+
         ############ MATRIX DE CONFUSION  #############
-        matrix = metrics.confusion_matrix(tf.math.argmax(y_learn, axis=1),tf.math.argmax(y_pred, axis=1))
-        print('prediction: {} at epoch: {} {}'.format(y_pred, epoch,uninq_ypred))
+        matrix = metrics.confusion_matrix(
+            tf.math.argmax(self.y_learn,axis=1), tf.math.argmax(y_pred, axis=1))
+        print('prediction: {} at epoch: {} {}'.format(
+            y_pred, epoch, uninq_ypred))
         print(matrix)
+        pass
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [PredictionCallback(),reduce_lr, checkpoint]  
+callbacks_list = [PredictionCallback(y_learn), reduce_lr, checkpoint]
 
-class_weights = {0:0.0561, 1:17.8179}
+class_weights = {0: 0.0561, 1: 17.8179}
 
 # # list des batchsize a tester
 batch_size = [64]
@@ -134,7 +150,7 @@ with open("historybigdata_sw.csv", "w", encoding="utf-8") as file:
             batch_size=64,
             callbacks=callbacks_list, class_weight=class_weights,
             shuffle=True
-        ) #
+        )
 
         for e in range(EPOCHS):
             file.write(f"{e},{batch},{history.history['accuracy'][e]},"
