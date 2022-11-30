@@ -96,7 +96,7 @@ x_learn = tf.data.Dataset.zip((X_train)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)
 y_learn = tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
     tf.data .experimental.AUTOTUNE)
-y_target_iter =[i for i in y_learn.as_numpy_iterator()]
+y_target_iter = np.concatenate([i for i in y_learn.as_numpy_iterator()])
 # y_target_batch = next(y_target_iter)
 # sw_training
 
@@ -116,23 +116,21 @@ class PredictionCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
         print(y_pred)
-        uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
-        
-        
-        
-
-        
-        
+        uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))    
         
         
         
         
 
         ############ MATRIX DE CONFUSION  #############
-        matrix = metrics.confusion_matrix(tf.math.argmax(self.y_target_iter,axis=1), tf.math.argmax(y_pred, axis=1))
-        print('prediction: {} at epoch: {} {}'.format(
-            y_pred, epoch, uninq_ypred))
+        # y_target = tf.concat(self.y_target_iter,1)
+        matrix = metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1))
+        # matrix = metrics.confusion_matrix(tf.math.argmax(y_target_iter,axis=1), tf.math.argmax(y_pred, axis=1))
+        print('prediction: {} at epoch: {} {}'.format(y_pred, epoch, uninq_ypred))
+        print([_.shape for _ in self.y_target_iter])
+        print("####################################################")
         print(matrix)
+        print("####################################################")
         pass
 
 
