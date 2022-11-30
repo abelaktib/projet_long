@@ -96,9 +96,8 @@ x_learn = tf.data.Dataset.zip((X_train)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)
 y_learn = tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
     tf.data .experimental.AUTOTUNE)
-y_learn =[i for i in y_learn.as_numpy_iterator()]
-y_learn = tf.ragged.constant(y_learn)
-dir(y_learn)
+y_target_iter =[i for i in y_learn.as_numpy_iterator()]
+# y_target_batch = next(y_target_iter)
 # sw_training
 
 
@@ -110,18 +109,27 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
 
 
 class PredictionCallback(tf.keras.callbacks.Callback):
-    def __init__(self, y_learn):
+    def __init__(self, y_target_iter):
         super()
-        self.y_learn = y_learn
+        self.y_target_iter = y_target_iter
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
         print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
 
         ############ MATRIX DE CONFUSION  #############
-        matrix = metrics.confusion_matrix(
-            tf.math.argmax(self.y_learn,axis=1), tf.math.argmax(y_pred, axis=1))
+        matrix = metrics.confusion_matrix(tf.math.argmax(self.y_target_iter,axis=1), tf.math.argmax(y_pred, axis=1))
         print('prediction: {} at epoch: {} {}'.format(
             y_pred, epoch, uninq_ypred))
         print(matrix)
@@ -132,7 +140,7 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [PredictionCallback(y_learn), reduce_lr, checkpoint]
+callbacks_list = [PredictionCallback(y_target_iter), reduce_lr, checkpoint]
 
 class_weights = {0: 0.0561, 1: 17.8179}
 
