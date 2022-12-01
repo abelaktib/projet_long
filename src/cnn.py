@@ -64,12 +64,7 @@ def cnn():
                            tf.keras.metrics.Precision(),
                            tf.keras.metrics.Recall(),
                            tf.keras.metrics.AUC(),
-                           tf.keras.metrics.AUC(curve="PR"),"accuracy"]
-                  
-                  ,metrics=[tf.keras.metrics.TruePositives(),
-                           tf.keras.metrics.TrueNegatives(),
-                           tf.keras.metrics.FalsePositives(),
-                           tf.keras.metrics.FalseNegatives()])
+                           tf.keras.metrics.AUC(curve="PR"),"accuracy"])
     return model
 
 

@@ -118,20 +118,18 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))    
         
-        
-        
-        
+                
 
         ############ MATRIX DE CONFUSION  #############
-        # y_target = tf.concat(self.y_target_iter,1)
-        matrix = metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1))
-        # matrix = metrics.confusion_matrix(tf.math.argmax(y_target_iter,axis=1), tf.math.argmax(y_pred, axis=1))
+        tn, fp, fn, tp = metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1)).ravel()
         print('prediction: {} at epoch: {} {}'.format(y_pred, epoch, uninq_ypred))
-        print([_.shape for _ in self.y_target_iter])
+        # print([_.shape for _ in self.y_target_iter])
         print("####################################################")
-        print(matrix)
+        with open("confusion_matrix.csv", "a", encoding="utf-8") as file_m:
+            file_m.write("TRUE_NEGATIF, FALSE_POSITIF, FALSE_NEGATIF, TRUE_POSITIF\n")
+            file_m.write(f"{tn},{fp},{fn},{tp}\n")
+            
         print("####################################################")
-        pass
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
@@ -144,9 +142,9 @@ class_weights = {0: 0.0561, 1: 17.8179}
 
 # # list des batchsize a tester
 batch_size = [64]
-EPOCHS = 1
+EPOCHS = 20
 with open("historybigdata_sw.csv", "w", encoding="utf-8") as file:
-    file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR,TRUE_POSITIVES,TRUE_NEGATIVES,FALSE_POSITIVES,FALSE_NEGATIVES,VAL_TRUE_POSITIVES,VAL_TRUE_NEGATIVES,VAL_FALSE_POSITIVES,VAL_FALSE_NEGATIVES\n")
+    file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
     for batch in batch_size:
 
@@ -173,15 +171,7 @@ with open("historybigdata_sw.csv", "w", encoding="utf-8") as file:
                        f"{history.history['val_recall'][e]},"
                        f"{history.history['binary_accuracy'][e]},"
                        f"{history.history['val_binary_accuracy'][e]},"
-                       f"{history.history['lr'][e]},"
-                       f"{history.history['true_positives'][e]},"
-                       f"{history.history['true_negatives'][e]},"
-                       f"{history.history['false_positives'][e]},"
-                       f"{history.history['false_negatives'][e]},"
-                       f"{history.history['val_true_positives'][e]},"
-                       f"{history.history['val_true_negatives'][e]},"
-                       f"{history.history['val_false_positives'][e]},"
-                       f"{history.history['val_false_negatives'][e]}\n"
+                       f"{history.history['lr'][e]}\n"
                        )
 
 fold_var += 1
