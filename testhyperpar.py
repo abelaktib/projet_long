@@ -96,7 +96,13 @@ x_learn = tf.data.Dataset.zip((X_train)).batch(64).prefetch(
     tf.data.experimental.AUTOTUNE)
 y_learn = tf.data.Dataset.zip((Y_train)).batch(64).prefetch(
     tf.data .experimental.AUTOTUNE)
+y_val = tf.data.Dataset.zip((Y_val)).batch(64).prefetch(
+    tf.data .experimental.AUTOTUNE)
+
 y_target_iter = np.concatenate([i for i in y_learn.as_numpy_iterator()])
+
+
+yval_target_iter = np.concatenate([i for i in y_val.as_numpy_iterator()])
 # y_target_batch = next(y_target_iter)
 # sw_training
 
@@ -109,15 +115,17 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
 
 
 class PredictionCallback(tf.keras.callbacks.Callback):
-    def __init__(self, y_target_iter):
+    def __init__(self, y_target_iter,yval_target_iter):
         super()
         self.y_target_iter = y_target_iter
+        self.yval_target_iter = yval_target_iter
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
         print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))    
-        
+        y_vali = self.model.predict(x_val)
+        uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))   
                 
 
         ############ MATRIX DE CONFUSION  #############
@@ -130,15 +138,26 @@ class PredictionCallback(tf.keras.callbacks.Callback):
             file_m.write(f"{tn},{fp},{fn},{tp}\n")
             
         print("####################################################")
+        
+        ############ MATRIX DE CONFUSION VAL #############
+        tnv, fpv, fnv, tpv = metrics.confusion_matrix(yval_target_iter.argmax(1), y_vali.argmax(1)).ravel()
+        print('prediction: {} at epoch: {} {}'.format(y_vali, epoch, uninq_ypred))
+        # print([_.shape for _ in self.y_target_iter])
+        print("####################################################")
+        with open("confusion_matrix_val.csv", "a", encoding="utf-8") as file_t:
+            file_t.write("TRUE_NEGATIF_VAL, FALSE_POSITIF_VAL, FALSE_NEGATIF_VAL, TRUE_POSITIF_VAL\n")
+            file_t.write(f"{tnv},{fpv},{fnv},{tpv}\n")
+            
+        print("####################################################")
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [PredictionCallback(y_target_iter), reduce_lr, checkpoint]
+callbacks_list = [PredictionCallback(y_target_iter,yval_target_iter), reduce_lr, checkpoint]
 
-class_weights = {0: 0.0561, 1: 17.8179}
+class_weights = {0: 0.5215, 1: 12.1334}
 
 # # list des batchsize a tester
 batch_size = [64]
