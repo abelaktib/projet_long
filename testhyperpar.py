@@ -1,6 +1,5 @@
 import src.inception as inception
 from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau
-from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import argparse
@@ -13,7 +12,6 @@ import matplotlib.pyplot as plt
 import h5py
 import random
 from sklearn import metrics
-import tensorflow_datasets as tfds
 
 _authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
@@ -120,7 +118,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))    
         y_vali = self.model.predict(x_val)
-        uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))   
+        # uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))   
                 
 
         ############ MATRIX DE CONFUSION  #############
