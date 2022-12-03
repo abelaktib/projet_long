@@ -2,7 +2,7 @@ import src.inception as inception
 from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV, cross_val_score
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import argparse
 import src.cnn as cnn
 import numpy as np
@@ -73,17 +73,12 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(
-    args.file, dataset="/sw_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
     64).prefetch(tf.data.experimental.AUTOTUNE)
-
-dir(learn)
-
-print(learn.element_spec[1])
 
 
 validation = tf.data.Dataset.zip((X_val, Y_val, sw_validation)).batch(
@@ -132,6 +127,10 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         tn, fp, fn, tp = metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1)).ravel()
         print('prediction: {} at epoch: {} {}'.format(y_pred, epoch, uninq_ypred))
         # print([_.shape for _ in self.y_target_iter])
+        disp = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1)))
+        disp.plot()
+        plt.show()
+        
         print("####################################################")
         with open("confusion_matrix.csv", "a", encoding="utf-8") as file_m:
             file_m.write("TRUE_NEGATIF, FALSE_POSITIF, FALSE_NEGATIF, TRUE_POSITIF\n")
