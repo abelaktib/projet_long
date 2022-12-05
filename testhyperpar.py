@@ -71,8 +71,9 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(
+    args.file, dataset="/sw_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
@@ -108,51 +109,75 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
 
 
 class PredictionCallback(tf.keras.callbacks.Callback):
-    def __init__(self, y_target_iter,yval_target_iter):
+    def __init__(self, y_target_iter, yval_target_iter):
         super()
         self.y_target_iter = y_target_iter
         self.yval_target_iter = yval_target_iter
+        self.compteur = 0
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
         print(y_pred)
-        uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))    
+        uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
         y_vali = self.model.predict(x_val)
-        # uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))   
-                
+        # uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))
 
         ############ MATRIX DE CONFUSION  #############
-        tn, fp, fn, tp = metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1)).ravel()
-        print('prediction: {} at epoch: {} {}'.format(y_pred, epoch, uninq_ypred))
+        tn, fp, fn, tp = metrics.confusion_matrix(
+            y_target_iter.argmax(1), y_pred.argmax(1)).ravel()
+        print('prediction: {} at epoch: {} {}'.format(
+            y_pred, epoch, uninq_ypred))
         # print([_.shape for _ in self.y_target_iter])
-        disp = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(y_target_iter.argmax(1), y_pred.argmax(1)))
+        disp = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
+            y_target_iter.argmax(1), y_pred.argmax(1)))
         disp.plot()
-        plt.show()
-        
+        plt.savefig('figure/learn/confusion_matrix'+str(self.compteur))
+        disp2 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
+            y_target_iter.argmax(1), y_pred.argmax(1),normalize='true'))
+        disp2.plot()
+        plt.savefig('figure/learn/confusion_matrix_normalize' +
+                    str(self.compteur))
+
         print("####################################################")
         with open("confusion_matrix.csv", "a", encoding="utf-8") as file_m:
-            file_m.write("TRUE_NEGATIF, FALSE_POSITIF, FALSE_NEGATIF, TRUE_POSITIF\n")
+            file_m.write(
+                "TRUE_NEGATIF, FALSE_POSITIF, FALSE_NEGATIF, TRUE_POSITIF\n")
             file_m.write(f"{tn},{fp},{fn},{tp}\n")
-            
+
         print("####################################################")
-        
+
         ############ MATRIX DE CONFUSION VAL #############
-        tnv, fpv, fnv, tpv = metrics.confusion_matrix(yval_target_iter.argmax(1), y_vali.argmax(1)).ravel()
-        print('prediction: {} at epoch: {} {}'.format(y_vali, epoch, uninq_ypred))
+        tnv, fpv, fnv, tpv = metrics.confusion_matrix(
+            yval_target_iter.argmax(1), y_vali.argmax(1)).ravel()
+        print('prediction: {} at epoch: {} {}'.format(
+            y_vali, epoch, uninq_ypred))
         # print([_.shape for _ in self.y_target_iter])
+        disp3 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
+            yval_target_iter.argmax(1), y_vali.argmax(1)))
+        disp3.plot()
+        plt.savefig('figure/val/confusion_val_matrix'+str(self.compteur))
+
+        disp4 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(yval_target_iter.argmax(1), y_vali.argmax(1), normalize='true'))
+        disp4.plot()
+        plt.savefig('figure/val/confusion_matrix_val_normalize' +
+                    str(self.compteur))
+
         print("####################################################")
         with open("confusion_matrix_val.csv", "a", encoding="utf-8") as file_t:
-            file_t.write("TRUE_NEGATIF_VAL, FALSE_POSITIF_VAL, FALSE_NEGATIF_VAL, TRUE_POSITIF_VAL\n")
+            file_t.write(
+                "TRUE_NEGATIF_VAL, FALSE_POSITIF_VAL, FALSE_NEGATIF_VAL, TRUE_POSITIF_VAL\n")
             file_t.write(f"{tnv},{fpv},{fnv},{tpv}\n")
-            
         print("####################################################")
+
+        self.compteur += 1
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 
 
-callbacks_list = [PredictionCallback(y_target_iter,yval_target_iter), reduce_lr, checkpoint]
+callbacks_list = [PredictionCallback(
+    y_target_iter, yval_target_iter), reduce_lr, checkpoint]
 
 class_weights = {0: 0.5215, 1: 12.1334}
 
