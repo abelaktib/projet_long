@@ -184,7 +184,7 @@ class_weights = {0: 0.5215, 1: 12.1334}
 # # list des batchsize a tester
 batch_size = [64]
 EPOCHS = 60
-with open("historybigdata_sw.csv", "w", encoding="utf-8") as file:
+with open("history_learnin1e6.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
     for batch in batch_size:
