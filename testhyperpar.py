@@ -174,7 +174,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=2, min_lr=0)
 earlyStopping = EarlyStopping(
-    monitor='val_loss', patience=10, verbose=0, mode='min')
+    monitor='val_loss', patience=15, verbose=0, mode='min')
 
 callbacks_list = [PredictionCallback(
     y_target_iter, yval_target_iter), reduce_lr, checkpoint,earlyStopping]
