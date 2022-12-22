@@ -13,7 +13,7 @@ import numpy as np
 
 # [K]
 from keras import Model, Input
-from keras.layers import Dense, Conv1D, Dropout, Flatten
+from keras.layers import Dense, Conv1D, Dropout, Flatten, Reshape
 
 
 def cnn():
@@ -33,7 +33,11 @@ def cnn():
     """
     # Neural network.
     inputs = Input(shape=(321, 13))
-    conv = Conv1D(filters=100, kernel_size=1, padding="same")(inputs)
+    reshape = Reshape((13, 321))(inputs)
+    crop = tf.keras.layers.Cropping1D(cropping=6)(reshape)
+    reshape2 = Reshape((321, 1))(crop)
+    conv = Conv1D(filters=100, kernel_size=1, padding="same")(reshape2)
+    
     drop = Dropout(0.2)(conv)
 
     conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,

@@ -71,8 +71,8 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
@@ -184,7 +184,7 @@ class_weights = {0: 0.5215, 1: 12.1334}
 # # list des batchsize a tester
 batch_size = [64]
 EPOCHS = 60
-with open("history_learnin1e6.csv", "w", encoding="utf-8") as file:
+with open("history_slide1.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
     for batch in batch_size:
