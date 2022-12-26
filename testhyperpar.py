@@ -1,6 +1,7 @@
 import src.inception as inception
 from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau
 from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import argparse
 import src.cnn as cnn
@@ -179,7 +180,25 @@ earlyStopping = EarlyStopping(
 callbacks_list = [PredictionCallback(
     y_target_iter, yval_target_iter), reduce_lr, checkpoint,earlyStopping]
 
-class_weights = {0: 0.5215, 1: 12.1334}
+
+
+
+##########Class WEIGHTING #################################
+print("#############################################################")
+
+class_weights = compute_class_weight(
+                                        "balanced",
+                                        classes = np.unique(Y_train),
+                                        y = Y_train.numpy()                                                  
+                                    )
+class_weights = dict(zip(np.unique(Y_train), class_weights))
+class_weights
+print("#############################################################")
+print("#############################################################")
+print("#############################################################")
+
+
+# class_weights = {0: 0.5215, 1: 12.1334}
 
 # # list des batchsize a tester
 batch_size = [64]
