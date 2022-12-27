@@ -14,7 +14,7 @@ import h5py
 import random
 from sklearn import metrics
 
-_authors__ = ["BELAKTIB Anas"]
+__authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
 __date__ = "16/11/2022"
 __version__ = "1.0.0"
@@ -62,6 +62,7 @@ model_cnn = cnn.cnn()
 f = h5py.File(args.file, 'r')
 print(list(f.keys()))
 
+ytrain = f['Y_training'][:]
 
 X_train = tfio.IODataset.from_hdf5(args.file, dataset=f"/X_training")
 Y_train = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_training")
@@ -72,8 +73,8 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
@@ -186,19 +187,27 @@ callbacks_list = [PredictionCallback(
 ##########Class WEIGHTING #################################
 print("#############################################################")
 
-class_weights = compute_class_weight(
-                                        "balanced",
-                                        classes = np.unique(Y_train),
-                                        y = Y_train.numpy()                                                  
-                                    )
-class_weights = dict(zip(np.unique(Y_train), class_weights))
-class_weights
+def calculating_class_weights(y_true):
+    number_dim = np.shape(y_true)[1]
+    weights = np.empty([number_dim, 2])
+    for i in range(number_dim):
+        weights[i] = compute_class_weight(
+            'balanced',
+            classes = [0.,1.], 
+            y = y_true[:, i])
+    return weights
+
+class_weights = calculating_class_weights(ytrain)
+class_weights =class_weights[0]
+print(class_weights)
+
+class_weights = {0: class_weights[1], 1: class_weights[0]}
+
 print("#############################################################")
 print("#############################################################")
 print("#############################################################")
 
 
-# class_weights = {0: 0.5215, 1: 12.1334}
 
 # # list des batchsize a tester
 batch_size = [64]
@@ -234,8 +243,8 @@ with open("history_slide1.csv", "w", encoding="utf-8") as file:
                        f"{history.history['lr'][e]}\n"
                        )
 
-fold_var += 1
-print(history.history.keys())
+# fold_var += 1
+# print(history.history.keys())
 # plt.plot(history.history['accuracy'])
 # plt.legend(['Train'], loc='upper left')
 # plt.ylabel('Accuracy')
