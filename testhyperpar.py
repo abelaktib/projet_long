@@ -73,8 +73,8 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sw_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sw_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
@@ -188,20 +188,16 @@ callbacks_list = [PredictionCallback(
 print("#############################################################")
 
 def calculating_class_weights(y_true):
-    number_dim = np.shape(y_true)[1]
-    weights = np.empty([number_dim, 2])
-    for i in range(number_dim):
-        weights[i] = compute_class_weight(
+    weights = compute_class_weight(
             'balanced',
             classes = [0.,1.], 
-            y = y_true[:, i])
+            y = y_true[:].argmax(axis=1))
     return weights
 
 class_weights = calculating_class_weights(ytrain)
-class_weights =class_weights[0]
 print(class_weights)
 
-class_weights = {0: class_weights[1], 1: class_weights[0]}
+class_weights = {0: class_weights[0], 1: class_weights[1]}
 
 print("#############################################################")
 print("#############################################################")
