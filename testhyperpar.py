@@ -118,7 +118,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
-        print(y_pred)
+        # print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
         y_vali = self.model.predict(x_val)
         # uninq_yvali = tf.unique_with_counts(tf.math.argmax(y_vali, axis=1))
@@ -135,7 +135,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         plt.savefig('figure/learn/confusion_matrix'+str(self.compteur))
         disp2 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             y_target_iter.argmax(1), y_pred.argmax(1),normalize='true'))
-        disp2.plot()
+        disp2.plot(values_format = '.3f')
         plt.savefig('figure/learn/confusion_matrix_normalize' +
                     str(self.compteur))
 
@@ -159,7 +159,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         plt.savefig('figure/val/confusion_val_matrix'+str(self.compteur))
 
         disp4 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(yval_target_iter.argmax(1), y_vali.argmax(1), normalize='true'))
-        disp4.plot()
+        disp4.plot(values_format = '.3f')
         plt.savefig('figure/val/confusion_matrix_val_normalize' +
                     str(self.compteur))
 
