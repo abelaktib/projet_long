@@ -38,15 +38,15 @@ def cnn():
     reshape2 = Reshape((321, 1))(crop)
     conv = Conv1D(filters=100, kernel_size=1, padding="same")(reshape2)
     
-    drop = Dropout(0.2)(conv)
+    drop = Dropout(0.3)(conv)
 
     conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,
                    padding="same")(drop)
-    drop2 = Dropout(0.2)(conv2)
+    drop2 = Dropout(0.3)(conv2)
 
     conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
                    padding="same")(drop2)
-    drop3 = Dropout(0.2)(conv3)
+    drop3 = Dropout(0.3)(conv3)
 
     
     # Set the output.
