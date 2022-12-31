@@ -209,7 +209,7 @@ print("#############################################################")
 batch_size = 64
 EPOCHS = 60
 learning_rate_list =[1e-8,1e-10,1e-12,1e-15,1e-20]
-with open("history_slide1.csv", "w", encoding="utf-8") as file:
+with open("history_slide1_lr.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
     for lr in learning_rate_list:
@@ -225,7 +225,7 @@ with open("history_slide1.csv", "w", encoding="utf-8") as file:
         )
 
         for e in range(EPOCHS):
-            file.write(f"{e},{batch},{history.history['accuracy'][e]},"
+            file.write(f"{e},{batch_size},{history.history['accuracy'][e]},"
                        f"{history.history['val_accuracy'][e]},"
                        f"{history.history['loss'][e]},"
                        f"{history.history['val_loss'][e]},"
