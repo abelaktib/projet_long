@@ -16,7 +16,7 @@ from keras import Model, Input
 from keras.layers import Dense, Conv1D, Dropout, Flatten, Reshape
 
 
-def cnn():
+def cnn(lr):
     """Apply a CNN to a given input.
 
     Parameters
@@ -38,15 +38,15 @@ def cnn():
     reshape2 = Reshape((321, 1))(crop)
     conv = Conv1D(filters=100, kernel_size=1, padding="same")(reshape2)
     
-    drop = Dropout(0.3)(conv)
+    drop = Dropout(0.4)(conv)
 
     conv2 = Conv1D(filters=int(100*(1.2**1)), kernel_size=3,
                    padding="same")(drop)
-    drop2 = Dropout(0.3)(conv2)
+    drop2 = Dropout(0.4)(conv2)
 
     conv3 = Conv1D(filters=int(100*(1.2**2)), kernel_size=3,
                    padding="same")(drop2)
-    drop3 = Dropout(0.3)(conv3)
+    drop3 = Dropout(0.4)(conv3)
 
     
     # Set the output.
@@ -61,7 +61,7 @@ def cnn():
     model = Model(inputs=inputs, outputs=output)
     
 
-    opt = tf.keras.optimizers.Adam(learning_rate=1e-8)
+    opt = tf.keras.optimizers.Adam(learning_rate=lr)
     # Compile then return the model.
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                   weighted_metrics=[tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5),

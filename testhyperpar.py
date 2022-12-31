@@ -50,7 +50,7 @@ np.random.seed(SEED)
 tf.random.set_seed(SEED)
 
 # SELECTION DU MODEL: Choisir 1 seul Modèle.
-model_cnn = cnn.cnn()
+
 
 # model_inc = inception.inception()
 
@@ -174,9 +174,9 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=2, min_lr=0)
+                              patience=3, min_lr=0)
 earlyStopping = EarlyStopping(
-    monitor='val_loss', patience=15, verbose=0, mode='min')
+    monitor='val_loss', patience=20, verbose=0, mode='min')
 
 callbacks_list = [PredictionCallback(
     y_target_iter, yval_target_iter), reduce_lr, checkpoint,earlyStopping]
@@ -206,12 +206,15 @@ print("#############################################################")
 
 
 # # list des batchsize a tester
-batch_size = [64]
+batch_size = 64
 EPOCHS = 60
+learning_rate_list =[1e-8,1e-10,1e-12,1e-15,1e-20]
 with open("history_slide1.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
-    for batch in batch_size:
+    for lr in learning_rate_list:
+        
+        model_cnn = cnn.cnn(lr)
 
         history = model_cnn.fit(
             learn, validation_data=validation,
