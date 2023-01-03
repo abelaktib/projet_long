@@ -109,12 +109,14 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
+
 class PredictionCallback(tf.keras.callbacks.Callback):
-    def __init__(self, y_target_iter, yval_target_iter):
+    def __init__(self, y_target_iter, yval_target_iter, lr):
         super()
         self.y_target_iter = y_target_iter
         self.yval_target_iter = yval_target_iter
         self.compteur = 0
+        self.lr = lr
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred = self.model.predict(x_learn)
@@ -132,15 +134,16 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         disp = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             y_target_iter.argmax(1), y_pred.argmax(1)))
         disp.plot()
-        plt.savefig('figure/learn/confusion_matrix'+str(self.compteur))
+        plt.savefig('figure/learn/confusion_matrix' +
+                    str(self.compteur)+"_" + str(lr))
         disp2 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
-            y_target_iter.argmax(1), y_pred.argmax(1),normalize='true'))
-        disp2.plot(values_format = '.3f')
-        plt.savefig('figure/learn/confusion_matrix_normalize' +
-                    str(self.compteur))
+            y_target_iter.argmax(1), y_pred.argmax(1), normalize='true'))
+        disp2.plot(values_format='.3f')
+        plt.savefig('figure/learn/confusion_matrix_normalize'
+                    + str(self.compteur)+"_" + str(self.lr))
 
         print("####################################################")
-        with open("confusion_matrix.csv", "a", encoding="utf-8") as file_m:
+        with open("confusion_matrix_" + str(self.lr) + ".csv", "a", encoding="utf-8") as file_m:
             file_m.write(
                 "TRUE_NEGATIF, FALSE_POSITIF, FALSE_NEGATIF, TRUE_POSITIF\n")
             file_m.write(f"{tn},{fp},{fn},{tp}\n")
@@ -156,15 +159,17 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         disp3 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             yval_target_iter.argmax(1), y_vali.argmax(1)))
         disp3.plot()
-        plt.savefig('figure/val/confusion_val_matrix'+str(self.compteur))
+        plt.savefig('figure/val/confusion_val_matrix' +
+                    str(self.compteur)+"_" + str(self.lr))
 
-        disp4 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(yval_target_iter.argmax(1), y_vali.argmax(1), normalize='true'))
-        disp4.plot(values_format = '.3f')
-        plt.savefig('figure/val/confusion_matrix_val_normalize' +
-                    str(self.compteur))
+        disp4 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
+            yval_target_iter.argmax(1), y_vali.argmax(1), normalize='true'))
+        disp4.plot(values_format='.3f')
+        plt.savefig('figure/val/confusion_matrix_val_normalize'
+                    + str(self.compteur)+"_" + str(self.lr))
 
         print("####################################################")
-        with open("confusion_matrix_val.csv", "a", encoding="utf-8") as file_t:
+        with open("confusion_matrix_val" + str(self.lr) + ".csv", "a", encoding="utf-8") as file_t:
             file_t.write(
                 "TRUE_NEGATIF_VAL, FALSE_POSITIF_VAL, FALSE_NEGATIF_VAL, TRUE_POSITIF_VAL\n")
             file_t.write(f"{tnv},{fpv},{fnv},{tpv}\n")
@@ -205,8 +210,8 @@ print("#############################################################")
 
 # # list des batchsize a tester
 batch_size = 64
-EPOCHS = 20
-learning_rate_list =[1e-8,1e-10,1e-12,1e-15,1e-20]
+EPOCHS = 100
+learning_rate_list =[1e-8]
 with open("history_slide1_lr.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
