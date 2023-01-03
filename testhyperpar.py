@@ -174,12 +174,11 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=3, min_lr=0)
+                              patience=20, min_lr=0)
 earlyStopping = EarlyStopping(
     monitor='val_loss', patience=20, verbose=0, mode='min')
 
-callbacks_list = [PredictionCallback(
-    y_target_iter, yval_target_iter), reduce_lr, checkpoint,earlyStopping]
+callbacks_list = [ reduce_lr]#PredictionCallback(y_target_iter, yval_target_iter),checkpoint,earlyStopping
 
 
 
@@ -207,7 +206,7 @@ print("#############################################################")
 
 # # list des batchsize a tester
 batch_size = 64
-EPOCHS = 60
+EPOCHS = 20
 learning_rate_list =[1e-8,1e-10,1e-12,1e-15,1e-20]
 with open("history_slide1_lr.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
