@@ -178,7 +178,6 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
 earlyStopping = EarlyStopping(
     monitor='val_loss', patience=20, verbose=0, mode='min')
 
-callbacks_list = [ reduce_lr]#PredictionCallback(y_target_iter, yval_target_iter),checkpoint,earlyStopping
 
 
 
@@ -212,6 +211,8 @@ with open("history_slide1_lr.csv", "w", encoding="utf-8") as file:
     file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
 
     for lr in learning_rate_list:
+        callbacks_list = [reduce_lr, PredictionCallback(
+            y_target_iter, yval_target_iter, lr)]  # , checkpoint,earlyStopping
         
         model_cnn = cnn.cnn(lr)
 
