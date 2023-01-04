@@ -109,7 +109,7 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
-class PredictionCallback(tf.keras.callbacks.Callback):
+class PredictionCallback(tf.keras.callbacks.Callback):### Dallback qui va lancer des predictions et créer des matrices de confusion apres l'apprentissage terminé
     def __init__(self, y_target_iter, yval_target_iter, lr):
         super()
         self.y_target_iter = y_target_iter
@@ -175,12 +175,10 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         self.compteur += 1
 
 
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=3, min_lr=0)
-earlyStopping = EarlyStopping(
-    monitor='val_loss', patience=20, verbose=0, mode='min')
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, min_lr=0) ##Callback qui va reduire le lr
+earlyStopping = EarlyStopping(monitor='val_loss', patience=20, verbose=0, mode='min') ## Callback qui va arreter l apprentissage
 
-csv_logger = CSVLogger('log.csv', append=True, separator=';')
+csv_logger = CSVLogger('log.csv', append=True, separator=';') ### Callback qui creer le csv de performance
 
 
 ########## Class WEIGHTING #################################
