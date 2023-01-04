@@ -1,5 +1,5 @@
 import src.inception as inception
-from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau,csv_logger
+from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau, csv_logger
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -73,8 +73,10 @@ Y_val = tfio.IODataset.from_hdf5(args.file, dataset=f"/Y_validation")
 # #
 
 # ###### Ajout des poids #####
-sw_training = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_training")  # ample_weights
-sw_validation = tfio.IODataset.from_hdf5(args.file, dataset="/sample_weights_validation")
+sw_training = tfio.IODataset.from_hdf5(
+    args.file, dataset="/sample_weights_training")  # ample_weights
+sw_validation = tfio.IODataset.from_hdf5(
+    args.file, dataset="/sample_weights_validation")
 
 # # Creation des dataset contenant les X , Y et poids  de chaque groupe
 learn = tf.data.Dataset.zip((X_train, Y_train, sw_training)).batch(
@@ -109,7 +111,8 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
-class PredictionCallback(tf.keras.callbacks.Callback):### Dallback qui va lancer des predictions et créer des matrices de confusion apres l'apprentissage terminé
+# Dallback qui va lancer des predictions et créer des matrices de confusion apres l'apprentissage terminé
+class PredictionCallback(tf.keras.callbacks.Callback):
     def __init__(self, y_target_iter, yval_target_iter, lr):
         super()
         self.y_target_iter = y_target_iter
@@ -175,10 +178,15 @@ class PredictionCallback(tf.keras.callbacks.Callback):### Dallback qui va lancer
         self.compteur += 1
 
 
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, min_lr=0) ##Callback qui va reduire le lr
-earlyStopping = EarlyStopping(monitor='val_loss', patience=20, verbose=0, mode='min') ## Callback qui va arreter l apprentissage
+# Callback qui va reduire le lr
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss', factor=0.2, patience=3, min_lr=0)
+# Callback qui va arreter l apprentissage
+earlyStopping = EarlyStopping(
+    monitor='val_loss', patience=20, verbose=0, mode='min')
 
-csv_logger = CSVLogger('log.csv', append=True, separator=';') ### Callback qui creer le csv de performance
+# Callback qui creer le csv de performance
+csv_logger = CSVLogger('log.csv', append=True, separator=';')
 
 
 ########## Class WEIGHTING #################################
@@ -209,7 +217,8 @@ EPOCHS = 100
 learning_rate_list = [1e-8]  # , 1e-10, 1e-12,1e-15,1e-20
 
 for lr in learning_rate_list:
-    callbacks_list = [reduce_lr, PredictionCallback(y_target_iter, yval_target_iter, lr), checkpoint,csv_logger]  # , checkpoint,earlyStopping
+    callbacks_list = [reduce_lr, PredictionCallback(
+        y_target_iter, yval_target_iter, lr), checkpoint, csv_logger]  # , checkpoint,earlyStopping
 
     model_cnn = cnn.cnn(lr)
 
