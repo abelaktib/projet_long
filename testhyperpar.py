@@ -1,5 +1,5 @@
 import src.inception as inception
-from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau,csv_logger
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -109,7 +109,6 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(save_dir+get_model_name(fold_var
                                                 save_best_only=True, mode='max')  # Ce callback permet de conserver le meilleur modele a chaque iteration.
 
 
-
 class PredictionCallback(tf.keras.callbacks.Callback):
     def __init__(self, y_target_iter, yval_target_iter, lr):
         super()
@@ -118,7 +117,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         self.compteur = 0
         self.lr = lr
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_train_end(self, logs=None):
         y_pred = self.model.predict(x_learn)
         # print(y_pred)
         uninq_ypred = tf.unique_with_counts(tf.math.argmax(y_pred, axis=1))
@@ -128,8 +127,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         ############ MATRIX DE CONFUSION  #############
         tn, fp, fn, tp = metrics.confusion_matrix(
             y_target_iter.argmax(1), y_pred.argmax(1)).ravel()
-        print('prediction: {} at epoch: {} {}'.format(
-            y_pred, epoch, uninq_ypred))
+        # print('prediction: {} at epoch: {} {}'.format(y_pred, epoch, uninq_ypred))
         # print([_.shape for _ in self.y_target_iter])
         disp = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             y_target_iter.argmax(1), y_pred.argmax(1)))
@@ -153,8 +151,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         ############ MATRIX DE CONFUSION VAL #############
         tnv, fpv, fnv, tpv = metrics.confusion_matrix(
             yval_target_iter.argmax(1), y_vali.argmax(1)).ravel()
-        print('prediction: {} at epoch: {} {}'.format(
-            y_vali, epoch, uninq_ypred))
+        # print('prediction: {} at epoch: {} {}'.format(y_vali, epoch, uninq_ypred))
         # print([_.shape for _ in self.y_target_iter])
         disp3 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             yval_target_iter.argmax(1), y_vali.argmax(1)))
@@ -179,23 +176,24 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=20, min_lr=0)
+                              patience=3, min_lr=0)
 earlyStopping = EarlyStopping(
     monitor='val_loss', patience=20, verbose=0, mode='min')
 
+csv_logger = CSVLogger('log.csv', append=True, separator=';')
 
 
-
-
-##########Class WEIGHTING #################################
+########## Class WEIGHTING #################################
 print("#############################################################")
+
 
 def calculating_class_weights(y_true):
     weights = compute_class_weight(
-            'balanced',
-            classes = [0.,1.], 
-            y = y_true[:].argmax(axis=1))
+        'balanced',
+        classes=[0., 1.],
+        y=y_true[:].argmax(axis=1))
     return weights
+
 
 class_weights = calculating_class_weights(ytrain)
 print(class_weights)
@@ -207,46 +205,23 @@ print("#############################################################")
 print("#############################################################")
 
 
-
 # # list des batchsize a tester
 batch_size = 64
 EPOCHS = 100
-learning_rate_list =[1e-8]
-with open("history_slide1_lr.csv", "w", encoding="utf-8") as file:
-    file.write("EPOCHS,BATCH,ACCURACY,VAL_ACCURACY,LOSS,VAL_LOSS,ROC,PR,VAL_ROC,VAL_PR,PRECISION,RECALL,VAL_PRECISION,VAL_RECALL,BIN_ACC,VAL_BIN_ACC,LR\n")
+learning_rate_list = [1e-8]  # , 1e-10, 1e-12,1e-15,1e-20
 
-    for lr in learning_rate_list:
-        callbacks_list = [reduce_lr, PredictionCallback(
-            y_target_iter, yval_target_iter, lr)]  # , checkpoint,earlyStopping
-        
-        model_cnn = cnn.cnn(lr)
+for lr in learning_rate_list:
+    callbacks_list = [reduce_lr, PredictionCallback(y_target_iter, yval_target_iter, lr), checkpoint,csv_logger]  # , checkpoint,earlyStopping
 
-        history = model_cnn.fit(
-            learn, validation_data=validation,
-            epochs=EPOCHS,
-            batch_size=64,
-            callbacks=callbacks_list, class_weight=class_weights,
-            shuffle=True
-        )
+    model_cnn = cnn.cnn(lr)
 
-        for e in range(EPOCHS):
-            file.write(f"{e},{batch_size},{history.history['accuracy'][e]},"
-                       f"{history.history['val_accuracy'][e]},"
-                       f"{history.history['loss'][e]},"
-                       f"{history.history['val_loss'][e]},"
-                       f"{history.history['auc'][e]},"
-                       f"{history.history['auc_1'][e]},"
-                       f"{history.history['val_auc'][e]},"
-                       f"{history.history['val_auc_1'][e]},"
-                       f"{history.history['precision'][e]},"
-                       f"{history.history['recall'][e]},"
-                       f"{history.history['val_precision'][e]},"
-                       f"{history.history['val_recall'][e]},"
-                       f"{history.history['binary_accuracy'][e]},"
-                       f"{history.history['val_binary_accuracy'][e]},"
-                       f"{history.history['lr'][e]}\n"
-                       )
-
+    history = model_cnn.fit(
+        learn, validation_data=validation,
+        epochs=EPOCHS,
+        batch_size=64,
+        callbacks=callbacks_list, class_weight=class_weights,
+        shuffle=True
+    )
 # fold_var += 1
 # print(history.history.keys())
 # plt.plot(history.history['accuracy'])
