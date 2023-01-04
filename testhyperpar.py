@@ -136,12 +136,12 @@ class PredictionCallback(tf.keras.callbacks.Callback):
             y_target_iter.argmax(1), y_pred.argmax(1)))
         disp.plot()
         plt.savefig('figure/learn/confusion_matrix' +
-                    str(self.compteur)+"_" + str(lr))
+                    str(self.compteur)+"_" + str(lr)+".png")
         disp2 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             y_target_iter.argmax(1), y_pred.argmax(1), normalize='true'))
         disp2.plot(values_format='.3f')
         plt.savefig('figure/learn/confusion_matrix_normalize'
-                    + str(self.compteur)+"_" + str(self.lr))
+                    + str(self.compteur)+"_" + str(self.lr)+".png")
 
         print("####################################################")
         with open("confusion_matrix_" + str(self.lr) + ".csv", "a", encoding="utf-8") as file_m:
@@ -160,13 +160,13 @@ class PredictionCallback(tf.keras.callbacks.Callback):
             yval_target_iter.argmax(1), y_vali.argmax(1)))
         disp3.plot()
         plt.savefig('figure/val/confusion_val_matrix' +
-                    str(self.compteur)+"_" + str(self.lr))
+                    str(self.compteur)+"_" + str(self.lr)+".png")
 
         disp4 = ConfusionMatrixDisplay(confusion_matrix=metrics.confusion_matrix(
             yval_target_iter.argmax(1), y_vali.argmax(1), normalize='true'))
         disp4.plot(values_format='.3f')
         plt.savefig('figure/val/confusion_matrix_val_normalize'
-                    + str(self.compteur)+"_" + str(self.lr))
+                    + str(self.compteur)+"_" + str(self.lr)+".png")
 
         print("####################################################")
         with open("confusion_matrix_val" + str(self.lr) + ".csv", "a", encoding="utf-8") as file_t:
@@ -215,13 +215,13 @@ print("#############################################################")
 # # list des batchsize a tester
 batch_size = 64
 EPOCHS = 20
-learning_rate_list = [1e-8]  # , 1e-10, 1e-12,1e-15,1e-20
+learning_rate_list = [1e-3]  # , 1e-10, 1e-12,1e-15,1e-20
 
 for lr in learning_rate_list:
     callbacks_list = [reduce_lr, PredictionCallback(
         y_target_iter, yval_target_iter, lr), checkpoint, csv_logger]  # , checkpoint,earlyStopping
 
-    model_cnn = cnn.cnn(lr)
+    model_cnn = simple.simple(lr)
 
     history = model_cnn.fit(
         learn, validation_data=validation,
