@@ -7,6 +7,7 @@ import tensorflow as tf
 from keras import Input, Model
 from keras.layers import Conv1D, Dense, concatenate, MaxPooling1D, Multiply,Flatten,Bidirectional,GRU
 from keras.layers import Dropout
+from keras.utils.vis_utils import plot_model
 
 __authors__ = ["BELAKTIB Anas"]
 __contact__ = ["anas.belaktib@etu.u-paris.fr"]
