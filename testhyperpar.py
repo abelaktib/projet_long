@@ -1,6 +1,6 @@
 import src.inception as inception
-from keras.callbacks import EarlyStopping, TensorBoard, ReduceLROnPlateau, csv_logger
-from sklearn.model_selection import GridSearchCV, cross_val_score
+from keras.callbacks import EarlyStopping,  ReduceLROnPlateau, CSVLogger
+from sklearn.model_selection import  cross_val_score
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import argparse
@@ -180,7 +180,8 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
 # Callback qui va reduire le lr
 reduce_lr = ReduceLROnPlateau(
-    monitor='val_loss', factor=0.2, patience=3, min_lr=0)
+    monitor='val_loss', factor=0.2, patience=80, min_lr=0)
+
 # Callback qui va arreter l apprentissage
 earlyStopping = EarlyStopping(
     monitor='val_loss', patience=20, verbose=0, mode='min')
@@ -213,7 +214,7 @@ print("#############################################################")
 
 # # list des batchsize a tester
 batch_size = 64
-EPOCHS = 100
+EPOCHS = 20
 learning_rate_list = [1e-8]  # , 1e-10, 1e-12,1e-15,1e-20
 
 for lr in learning_rate_list:

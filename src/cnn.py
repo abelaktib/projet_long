@@ -64,14 +64,14 @@ def cnn(lr):
     opt = tf.keras.optimizers.Adam(learning_rate=lr)
     # Compile then return the model.
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                  weighted_metrics=[tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5),
+                  weighted_metrics=["accuracy",tf.keras.metrics.BinaryAccuracy(name="binary_accuracy", dtype=None, threshold=0.5),
                             tf.keras.metrics.Precision(name="precision"),
                             tf.keras.metrics.Recall(name="recall"),
                             tf.keras.metrics.AUC(name="auc"),
-                            tf.keras.metrics.AUC(name="auc_1",curve="PR"),"accuracy"])
+                            tf.keras.metrics.AUC(name="auc_1",curve="PR")])
     return model
 
 
-# model = cnn()
+# model = cnn(1e-8)
 # print(model.summary())
 
