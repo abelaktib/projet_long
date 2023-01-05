@@ -43,8 +43,8 @@ def simple(lr):
     # Set the output.
     flat = Flatten()(drop)
     dense3 = Dense(2, activation="softmax")(flat)
-    drop2 = Dropout(0.1)(dense3)
-    output = Flatten()(drop2)
+    # drop2 = Dropout(0.1)(dense3)
+    output = Flatten()(dense3)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)

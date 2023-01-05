@@ -5,6 +5,7 @@ from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import argparse
 import src.cnn as cnn
+import src.simple as simple
 import numpy as np
 import pandas as pd
 import tensorflow_io as tfio
