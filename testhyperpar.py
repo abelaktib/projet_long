@@ -182,7 +182,6 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 
 ############
 ############ COURBE ROC #############œ
-        self.compteur += 1
         # ROC curve
         fpr, tpr, tresholds = metrics.roc_curve(y_target_iter.argmax(1), y_pred.argmax(1))
         roc_auc = metrics.auc(fpr, tpr)
