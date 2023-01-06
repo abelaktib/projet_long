@@ -13,7 +13,7 @@ import numpy as np
 
 # [K]
 from keras import Model, Input
-from keras.layers import Dense, Conv1D, Dropout, Flatten, Reshape
+from keras.layers import Dense, Conv1D, Dropout, Flatten, Reshape, Activation
 
 
 def simple(lr):
@@ -42,9 +42,10 @@ def simple(lr):
 
     # Set the output.
     flat = Flatten()(drop)
-    dense3 = Dense(2, activation="softmax")(flat)
-    # drop2 = Dropout(0.1)(dense3)
-    output = Flatten()(dense3)
+    dense3 = Dense(2)(flat)
+    drop2 = Dropout(0.5)(dense3)
+    acti = Activation('softmax')(drop2)
+    output = Flatten()(acti)
 
     # Set the model.
     model = Model(inputs=inputs, outputs=output)
@@ -61,6 +62,6 @@ def simple(lr):
     return model
 
 
-# model = simple(1e-8)
-# print(model.summary())
+model = simple(1e-8)
+print(model.summary())
 

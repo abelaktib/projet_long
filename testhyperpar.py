@@ -179,6 +179,25 @@ class PredictionCallback(tf.keras.callbacks.Callback):
         self.compteur += 1
 
 
+
+############
+############ COURBE ROC #############œ
+        self.compteur += 1
+        # ROC curve
+        fpr, tpr, tresholds = metrics.roc_curve(y_target_iter.argmax(1), y_pred.argmax(1))
+        roc_auc = metrics.auc(fpr, tpr)
+        roc_display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc)
+        roc_display.plot()
+        roc_display.figure_.savefig('figure/roc'+
+                    str(self.compteur)+"_" + str(self.lr)+".jpeg")
+
+        # PR Curve
+        precision, recall, _ = metrics.precision_recall_curve(y_target_iter.argmax(1), y_pred.argmax(1))
+        pr_display = metrics.PrecisionRecallDisplay(precision=precision, recall=recall)
+        pr_display.plot()
+        pr_display.figure_.savefig('figure/pr'+
+                    str(self.compteur)+"_" + str(self.lr)+".jpeg")
+
 # Callback qui va reduire le lr
 reduce_lr = ReduceLROnPlateau(
     monitor='val_loss', factor=0.2, patience=80, min_lr=0)
@@ -216,7 +235,7 @@ print("#############################################################")
 # # list des batchsize a tester
 batch_size = 64
 EPOCHS = 20
-learning_rate_list = [1e-3]  # , 1e-10, 1e-12,1e-15,1e-20
+learning_rate_list = [1e-4]  # , 1e-10, 1e-12,1e-15,1e-20
 
 for lr in learning_rate_list:
     callbacks_list = [reduce_lr, PredictionCallback(
