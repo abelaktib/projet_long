@@ -40,9 +40,11 @@ Dataset must be a h5py File. This file need contains differents parts:
 To Change or test hyperparameters you need to go at line : 235-237 of main.py and change as you want
 
 ### Defaut hyperparameters
-batch_size = 64
-EPOCHS = 20
-learning_rate_list = [1e-4, 1e-5]  
+- batch_size = 64
+- EPOCHS = 20
+- learning_rate_list = [1e-4, 1e-5]  
+
+
 
 ### Change the model
 To change the model you need go at line : 243 of main.py and change as you want
