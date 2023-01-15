@@ -54,23 +54,29 @@ list of different model avaible : cnn.cnn(lr), inception.inception(), gru.gru(),
    model_cnn = cnn.cnn(lr)
    
 ### CALLBACKS :
-reduce_lr : Reduce your learning rate during epochs to keep the loss decreasing \
+reduce_lr : Reduce your learning rate during epochs to keep the loss decreasing 
 
 
-earlyStopping = Stop epochs when your model dont learn anymore \
+earlyStopping = Stop epochs when your model dont learn anymore 
 
 
-csv_logger = save all your metrics on a csv you can change the csvfile name at line 209 of main.py \
+csv_logger = save all your metrics on a csv you can change the csvfile name at line 209 of main.py 
 
 
-checkpoint = save the best model in the fil mentioned line 110 of main.py \
+checkpoint = save the best model in the fil mentioned line 110 of main.py 
 
 
 ## FOLDERS
 /analyse : contains analyse last analyse of our study on the all dataset
+
 /analysebigdata  : contains analyse first analyse of our study on the all dataset
+
 /doc : contain publication and report
+
 /figure : contain matrix of confusion
+
 /saved_models : contains previously best model saved
+
 /src : contain python code model and saving model code
+
 /tmp : folder to save temporary models
