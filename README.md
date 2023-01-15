@@ -3,7 +3,7 @@
 ✍ Author:
 
 **BELAKTIB Anas**
-*Master 2 Bio-informatics at *Univerité de Paris*.
+Master 2 Bio-informatics at *Univerité de Paris*.
 
 # 🔎 Interesting path
 - 📑 Report: `doc/report.pdf`
